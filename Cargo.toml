@@ -1,0 +1,48 @@
+[package]
+name = "soundfx-rs"
+description = "Discord bot for custom sound effects and soundboards"
+license = "AGPL-3.0-only"
+version = "1.5.17"
+authors = ["jellywx <judesouthworth@pm.me>"]
+edition = "2018"
+
+[dependencies]
+songbird = { version = "0.4", features = ["builtin-queue"] }
+poise = "0.6.1-rc1"
+sqlx = { version = "0.7.3", default-features = false, features = ["runtime-tokio-rustls", "macros", "mysql", "bigdecimal", "migrate"] }
+tokio = { version = "1", features = ["fs", "process", "io-util", "rt-multi-thread"] }
+lazy_static = "1.4"
+reqwest = "0.11"
+env_logger = "0.10"
+regex = "1.10"
+log = "0.4"
+serde_json = "1.0"
+dashmap = "5.5"
+serde = "1.0"
+dotenv = "0.15.0"
+prometheus = { version = "0.13.3", optional = true }
+axum = { version = "0.7.2", optional = true }
+
+[dependencies.symphonia]
+version = "0.5"
+features = ["ogg"]
+
+[features]
+metrics = ["dep:prometheus", "dep:axum"]
+
+[package.metadata.deb]
+features = ["metrics"]
+depends = "$auto, ffmpeg"
+suggests = "mysql-server-8.0"
+maintainer-scripts = "debian"
+assets = [
+    ["target/release/soundfx-rs", "usr/bin/soundfx-rs", "755"],
+    ["conf/default.env", "etc/soundfx-rs/config.env", "600"]
+]
+conf-files = [
+    "/etc/soundfx-rs/config.env",
+]
+
+[package.metadata.deb.systemd-units]
+unit-scripts = "systemd"
+start = false
